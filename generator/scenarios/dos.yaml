@@ -5,5 +5,5 @@ output:
   pcap: traces/dos.pcap
 attack:
   types: [dos]
-  trigger_rate: 2000
+  trigger_rate: 50      # prob. 1/N por mensagem — MENOR = mais ataques
 verbose: {client: false, server: false, attacker: false}

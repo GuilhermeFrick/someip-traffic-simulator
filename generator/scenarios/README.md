@@ -24,7 +24,8 @@ output:
   interface: lo               # (opcional) envia ao vivo numa interface
 attack:
   types: [dos, fuzzy]         # módulos de src/attacks/ (vazio = só benigno)
-  trigger_rate: 5000          # 1..N uniforme dispara um ataque
+  trigger_rate: 50            # prob. 1/N por mensagem de disparar um ataque
+                              #   MENOR = MAIS ataques (ex.: 50 dispara muito; 2000 quase nunca)
   interval_min_ms: 1
   interval_max_ms: 3
 topology:                     # opcional — padrão usa os XML de config/

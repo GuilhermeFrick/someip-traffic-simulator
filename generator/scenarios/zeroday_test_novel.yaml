@@ -6,5 +6,5 @@ output:
   pcap: traces/zeroday_test_novel.pcap
 attack:
   types: [replay]      # família ausente do treino -> zero-day
-  trigger_rate: 3000
+  trigger_rate: 50     # prob. 1/N por mensagem — MENOR = mais ataques
 verbose: {client: false, server: false, attacker: false}
