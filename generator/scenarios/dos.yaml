@@ -1,0 +1,9 @@
+# Tráfego benigno + ataque de DoS (inundação de notificações).
+seed: 42
+packets_per_client: 100
+output:
+  pcap: traces/dos.pcap
+attack:
+  types: [dos]
+  trigger_rate: 2000
+verbose: {client: false, server: false, attacker: false}

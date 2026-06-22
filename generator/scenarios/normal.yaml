@@ -1,0 +1,8 @@
+# Tráfego só-benigno (nenhum ataque). Útil como base e para treinar o "normal".
+seed: 42
+packets_per_client: 100
+output:
+  pcap: traces/normal.pcap
+attack:
+  types: []        # vazio = nenhum ataque
+verbose: {client: false, server: false, attacker: false}

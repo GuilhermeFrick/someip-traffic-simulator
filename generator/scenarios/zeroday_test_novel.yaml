@@ -1,0 +1,10 @@
+# ZERO-DAY — conjunto de TESTE: benigno + ataque NOVO (replay), nunca visto no treino.
+# Mede se o modelo treinado nos conhecidos detecta um tipo inédito como anomalia.
+seed: 7
+packets_per_client: 200
+output:
+  pcap: traces/zeroday_test_novel.pcap
+attack:
+  types: [replay]      # família ausente do treino -> zero-day
+  trigger_rate: 3000
+verbose: {client: false, server: false, attacker: false}

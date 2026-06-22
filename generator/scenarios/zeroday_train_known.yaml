@@ -1,0 +1,10 @@
+# ZERO-DAY — conjunto de TREINO: benigno + ataques CONHECIDOS (dos, fuzzy, mitm).
+# O modelo é treinado aqui. O replay/tamper ficam de fora de propósito.
+seed: 42
+packets_per_client: 200
+output:
+  pcap: traces/zeroday_train_known.pcap
+attack:
+  types: [dos, fuzzy, mitm]
+  trigger_rate: 3000
+verbose: {client: false, server: false, attacker: false}

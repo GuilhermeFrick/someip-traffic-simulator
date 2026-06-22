@@ -160,15 +160,18 @@ def str2bool(s):
     else:
         return False
 
-def start():
+def start(config_path="config/config.ini"):
     """
     Starts the Generator.
     Reads needed Configurations and initializes Clients, Servers and Attackers.
     Starts Client, Server and Attackers as seperate processes.
+
+    :param config_path: caminho do arquivo .ini (padrão: config/config.ini).
+                        A CLI run_scenario.py gera esse .ini a partir de um YAML.
     """
 
     Config = configparser.ConfigParser()
-    Config.read("config/config.ini")
+    Config.read(config_path)
 
     deviceFile = Config["Files"]['deviceFile']
     serviceFile = Config["Files"]['serviceFile']

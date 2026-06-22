@@ -186,7 +186,8 @@ def attacker (a):
     a.setIntervalMin(intervalMin)
     a.setIntervalMax(intervalMax)
 
-    attacksToUse = [elem.strip() for elem in a.attacks['attacks'].split(',')]
+    # filtra vazios -> permite cenário só-benigno (attacks= vazio) sem quebrar o loader
+    attacksToUse = [elem.strip() for elem in a.attacks['attacks'].split(',') if elem.strip()]
 
     if a.verbose:
         print ('Configured Attacks: ', attacksToUse)    
