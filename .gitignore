@@ -1,0 +1,18 @@
+# Saídas geradas (PCAPs e ground truth) — não versionar
+generator/traces/*.pcap
+generator/traces/*.npy
+*.pcap
+*.labels.npy
+
+# Sphinx build
+generator/docs/build/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# OS
+Thumbs.db
+.DS_Store
