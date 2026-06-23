@@ -1,0 +1,12 @@
+# Tráfego benigno + ataque de FUZZING.
+# A cada disparo, o atacante injeta uma rajada de 12 NOTIFICATIONs malformadas:
+# service aleatório (0x2000-0x9000), method aleatório, payload hex aleatório (0-20 B).
+# Assinatura: baixa verossimilhança / alta entropia sob o byte-model do normal.
+seed: 42
+packets_per_client: 100
+output:
+  pcap: traces/fuzzy.pcap
+attack:
+  types: [fuzzy]
+  trigger_rate: 50      # prob. 1/N por mensagem — MENOR = mais ataques
+verbose: {client: false, server: false, attacker: false}
