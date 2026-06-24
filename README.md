@@ -22,6 +22,81 @@ produzindo **PCAP + ground truth por pacote**. Cobre **toda a taxonomia (7/7 fam
 DoS, Fuzzy, MITM, Tamper, Replay, anomalias de processo e falha de hardware (Weibull).
 Detalhes em [`docs/fase1a-gerador.md`](docs/fase1a-gerador.md).
 
+## Como usar
+
+Todo o uso é a partir de `generator/`, dirigido por um **único arquivo YAML** por cenário
+(nada de editar `config.ini`/XML na mão). Detalhes do esquema em
+[`generator/scenarios/README.md`](generator/scenarios/README.md).
+
+### 1. Requisitos
+```bash
+cd generator
+pip install pyyaml scapy
+```
+
+### 2. Gerar um cenário
+```bash
+python run_scenario.py scenarios/fuzzy.yaml          # gera o tráfego
+python run_scenario.py scenarios/fuzzy.yaml --dry-run  # só mostra o config gerado, sem rodar
+```
+Cada execução produz, em `traces/`:
+- `<nome>.pcap` — o tráfego SOME/IP;
+- `<nome>.pcap.labels.npy` — **ground truth por pacote** (rótulo = nome do ataque, ou `normal`),
+  alinhado ao índice do PCAP.
+
+Ver o que foi gerado:
+```bash
+python -c "import numpy as np,collections; print(collections.Counter(np.load('traces/fuzzy.pcap.labels.npy',allow_pickle=True).tolist()))"
+```
+
+### 3. Configurar um cenário (esquema do YAML)
+```yaml
+seed: 42                      # semente do processo-pai (ver nota de reprodutibilidade)
+packets_per_client: 100       # volume de tráfego (pacotes por cliente/método)
+output:
+  pcap: traces/meu_cenario.pcap
+  interface: lo               # (opcional) também envia ao vivo numa interface
+attack:
+  types: [dos, fuzzy]         # módulos de ataque (lista vazia [] = só benigno)
+  trigger_rate: 50            # prob. 1/N por mensagem de disparar -> MENOR = MAIS ataques
+  interval_min_ms: 1          # intervalo de resposta do atacante
+  interval_max_ms: 3
+topology:                     # (opcional) padrão usa os XML de config/
+  devices: config/devices.xml
+  services: config/services.xml
+verbose: {client: false, server: false, attacker: false}
+```
+
+**Ataques disponíveis** (`attack.types`): `dos`, `fuzzy`, `mitm`, `replay`, `tamper`,
+`hwfailure`, `fakeClientID`, `wrongInterface`, `disturbTiming`, `fakeResponse`,
+`sendErrorOnError`, `sendErrorOnEvent`, `deleteRequest`, `deleteResponse`
+(= nomes dos módulos em [`generator/src/attacks/`](generator/src/attacks/)).
+
+**Ajustar o volume de ataque:** `trigger_rate` é a probabilidade `1/N` por mensagem.
+`50` dispara bastante; `2000` quase nunca. Para uma fração tipo-Kim (~12% de ataque),
+suba o `trigger_rate` até a contagem de ataque no ground truth bater.
+
+**Cenários prontos** (`scenarios/`): `normal` (só benigno), `dos`, `fuzzy`, e o par de
+zero-day `zeroday_train_known` (dos/fuzzy/mitm) × `zeroday_test_novel` (replay).
+
+### 4. Testar o tráfego gerado (no IDS)
+A avaliação fica no repositório **`someip-ids-multiclass-contentext`** (carrega o PCAP, extrai
+features `content_ext`, treina/testa e gera métricas + matriz de confusão):
+```bash
+cd ../../someip-ids-multiclass-contentext
+pip install scapy xgboost scikit-learn matplotlib
+# 1 PCAP: métricas + matriz de confusão (70/30)
+python eval_pcap.py "<...>/generator/traces/fuzzy.pcap"
+# zero-day: treina nos conhecidos, mede detecção do ataque NOVO
+python eval_pcap.py "<...>/traces/zeroday_train_known.pcap" --test-pcap "<...>/traces/zeroday_test_novel.pcap" --binary
+```
+Ou, interativo, o notebook `notebooks/06-testar-pcap-gerado.ipynb` (mostra tudo inline, roda no Colab).
+
+> **Nota de reprodutibilidade:** o gerador roda clientes/servidores/atacante como **processos
+> separados** (`multiprocessing`), então `seed` no pai **não** torna a saída bit-a-bit
+> determinística. O YAML torna a **configuração** reprodutível e versionável; determinismo por
+> processo é trabalho futuro.
+
 ## Licença e atribuição
 
 O diretório [`generator/`](generator/) é **derivado** do projeto
